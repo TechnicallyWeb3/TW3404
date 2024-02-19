@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-
+// TW3's take on what "ERC404" should be
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-abstract contract TW3404 is ERC1155, ERC20 {
+abstract contract BoundERC1155 is ERC1155, ERC20 {
     constructor(string memory _dataUrl, string memory _name, string memory _symbol, uint256 _erc20PerErc721) ERC1155(_dataUrl) ERC20(_name, _symbol) {
         erc20PerErc721 = _erc20PerErc721;
     }
@@ -134,6 +134,16 @@ abstract contract TW3404 is ERC1155, ERC20 {
 
         // include any additional erc20 funds
         if (erc20Required > 0) {
+            // update _totalSupply for additional funds minted/burned
+            if (from == address(0)) {
+                // Overflow check required: The rest of the code assumes that totalSupply never overflows
+                _totalSupply[erc20Id] += erc20Required;
+            } 
+    
+            if (to == address(0)) {
+                // Overflow possible: value unchecked, gets checked later in the super._update
+                _totalSupply[erc20Id] -= erc20Required;
+            }
             newIds[newIds.length-1] = erc20Id;
             newValues[newValues.length-1] = erc20Required;
         }
@@ -160,19 +170,26 @@ abstract contract TW3404 is ERC1155, ERC20 {
                 // burn - adjust array instead and use single super._update at function end
                 // add sender and receiver addresses to set for final super._update
                 super._update(_address, address(0), finalIds, finalValues);
+                // emit burn
             }
 
             // updates balance, minting any tokens which have been combined, should only ever be off by 1, except while minting.
             while (balanceOf(_address) / erc20PerErc721 > ownedTokens[_address].length) {
+                // skips used ids from custom minting finds next available erc721Id
+                while (_totalSupply[erc721Id] > 0) {
+                    erc721Id ++;
+                }
+
                 finalIds[0] = erc721Id;
                 ownedTokens[_address].push(erc721Id);
                 _totalSupply[erc721Id] += 1;
                 // update to formal error
                 require (_totalSupply[erc721Id] < 2, "NFT not unique");
-                erc721Id ++;
                 
                 // mint
                 super._update(address(0), _address, finalIds, finalValues);
+
+                // emit mint
             }
         }
     }
