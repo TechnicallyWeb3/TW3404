@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
+// TW3's BoundERC1155 implementation
 pragma solidity ^0.8.20;
 
 import "./boundERC1155.sol";
 
-contract ImplimentationContract is TW3404{
+contract DeploymentContract is BoundERC1155 {
 
-    constructor(string memory urlERC1155, string memory nameERC20, string memory symbolERC20, uint256 ERC20perERC721) TW3404(urlERC1155, nameERC20, symbolERC20, ERC20perERC721) {
+    constructor(string memory urlERC1155, string memory nameERC20, string memory symbolERC20, uint256 ERC20perERC721) BoundERC1155(urlERC1155, nameERC20, symbolERC20, ERC20perERC721) {
 
     }
 
@@ -35,4 +36,8 @@ contract ImplimentationContract is TW3404{
             _mintBatch(msg.sender, erc721Ids, erc721Values, "");
         }
     }
+
+    // add in queuing and whitelist logic by overriding the _update function, 
+    // could use address(this) to store NFTs instead of burning and minting excluding whitelist from 
+    // should include the ability to perform the super._update from BoundERC1155 to allow for whitelisted transactions. superUpdate(data)?
 }
