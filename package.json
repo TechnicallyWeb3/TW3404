@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  },
+  "name": "tw3404",
+  "description": "TW3404 is my rendition of \"ERC404\" using a combined ERC1155 and ERC20 contract to achieve the same results, while allowing NFTs to become transferrable.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
